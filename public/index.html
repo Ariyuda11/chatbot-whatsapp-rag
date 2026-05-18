@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Bot Simple</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #eef2f5 100%);
+      color: #2c3e50;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+      border-left: 5px solid #2c3e50;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #bdc3c7;
+    }
+
+    .status-dot.active {
+      background: #1abc9c;
+      box-shadow: 0 0 8px rgba(26, 188, 156, 0.4);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: white;
+      padding: 0 32px;
+      border-bottom: 1px solid #ecf0f1;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    }
+
+    .tab {
+      background: transparent;
+      border: none;
+      padding: 16px 24px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #7f8c8d;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .tab:hover {
+      color: #2c3e50;
+      background: rgba(44, 62, 80, 0.04);
+    }
+
+    .tab.active {
+      color: #2c3e50;
+      border-bottom-color: #2c3e50;
+    }
+
+    .content {
+      background: white;
+      padding: 40px;
+      border-radius: 0 12px 12px 12px;
+      box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+      min-height: 400px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 14px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.3s;
+      background: #fafbfc;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #2c3e50;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.08);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      background: #2c3e50;
+      color: white;
+      padding: 11px 26px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 2px 6px rgba(44, 62, 80, 0.15);
+    }
+
+    .btn:hover {
+      background: #1a252f;
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .btn-success {
+      background: #1abc9c;
+    }
+
+    .btn-success:hover {
+      background: #16a085;
+    }
+
+    .keyword-list {
+      margin-top: 32px;
+    }
+
+    .keyword-item {
+      background: #f8fafb;
+      padding: 18px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 16px;
+      border: 1px solid #ecf0f1;
+      transition: all 0.3s;
+    }
+
+    .keyword-item:hover {
+      background: white;
+      border-color: #d0d5db;
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.1);
+    }
+
+    .keyword-info {
+      flex: 1;
+    }
+
+    .keyword-info strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .keyword-info p {
+      color: #556983;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .keyword-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .keyword-actions .btn {
+      padding: 8px 16px;
+      font-size: 12px;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      border-left: 4px solid;
+      line-height: 1.6;
+    }
+
+    .alert-info {
+      background: #e8f4f8;
+      color: #0a4f6b;
+      border-left-color: #3498db;
+    }
+
+    .qr-container {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .qr-container h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .qr-container p {
+      color: #7f8c8d;
+      margin-bottom: 24px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #qrcode {
+      max-width: 300px;
+      margin: 20px auto;
+      padding: 16px;
+      background: #f8fafb;
+      border-radius: 12px;
+      border: 1px solid #ecf0f1;
+    }
+
+    .ready-section {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .ready-section h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #1abc9c;
+      font-weight: 700;
+    }
+
+    .ready-section p {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .notification {
+      position: fixed;
+      bottom: -100px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+      transition: all 0.3s;
+      max-width: 350px;
+      z-index: 9999;
+    }
+
+    .notification.show {
+      bottom: 20px;
+    }
+
+    .notification-success {
+      background: #1abc9c;
+      color: white;
+    }
+
+    .notification-error {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .notification-warning {
+      background: #f39c12;
+      color: white;
+    }
+
+    .notification-info {
+      background: #3498db;
+      color: white;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 20px;
+      }
+
+      .tabs {
+        padding: 0 12px;
+      }
+
+      .content {
+        padding: 24px;
+      }
+
+      .keyword-item {
+        flex-direction: column;
+      }
+
+      .keyword-actions {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="header">
+      <h1>Bot WhatsApp Sederhana</h1>
+
+      <div class="status-bar">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Memeriksa status...</span>
+
+        <div style="margin-left: auto; display: flex; gap: 12px;">
+          <button class="btn" id="startBtn" style="display: none;">
+            Mulai Bot
+          </button>
+
+          <button class="btn btn-danger" id="stopBtn" style="display: none;">
+            Hentikan Bot
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('control')">
+        Kontrol Bot
+      </button>
+
+      <button class="tab" onclick="switchTab('knowledge')">
+        Basis Pengetahuan
+      </button>
+    </div>
+
+    <div class="content">
+
+      <div id="control" class="tab-pane active">
+
+        <h2>Kontrol Bot</h2>
+
+        <p class="subtitle">
+          Kelola koneksi bot WhatsApp Anda
+        </p>
+
+        <div class="alert alert-info">
+          Gunakan panel ini untuk menghubungkan bot dengan akun WhatsApp Anda
+        </div>
+
+        <div id="qrSection" style="display: none;">
+          <div class="qr-container">
+
+            <h3>Pindai Kode QR</h3>
+
+            <p>
+              Buka WhatsApp di HP Anda → Menu → Perangkat Tertaut → Tautkan Perangkat
+            </p>
+
+            <div id="qrcode"></div>
+
+          </div>
+        </div>
+
+        <div id="readySection" style="display: none;">
+          <div class="ready-section">
+            <h3>✓ Bot Terhubung</h3>
+            <p>Bot siap menerima dan membalas pesan WhatsApp</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="knowledge" class="tab-pane">
+
+        <h2>Basis Pengetahuan</h2>
+
+        <p class="subtitle">
+          Kelola kata kunci dan respons otomatis
+        </p>
+
+        <div class="form-group">
+          <label>Kata Kunci (huruf kecil)</label>
+
+          <input
+            type="text"
+            id="keyword"
+            placeholder="cth: halo, menu, bantuan"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Respons</label>
+
+          <textarea
+            id="response"
+            placeholder="Tuliskan respons otomatis..."
+          ></textarea>
+        </div>
+
+        <div class="button-group">
+
+          <button
+            class="btn btn-success"
+            onclick="saveKeyword()"
+          >
+            Simpan Kata Kunci
+          </button>
+
+          <button
+            class="btn"
+            onclick="clearForm()"
+          >
+            Bersihkan
+          </button>
+
+        </div>
+
+        <div class="keyword-list">
+          <h3>Daftar Kata Kunci</h3>
+          <div id="keywordItems"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
